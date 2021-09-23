@@ -11,6 +11,9 @@ public class PlayerController : MonoBehaviour
     //private float jumpHeight = 1.0f;
     private float gravityValue = -9.81f;
 
+    public GameObject YouWin;
+    public GameObject YouLose;
+
     // Gameplay
     private bool hasShake = false;
 
@@ -49,6 +52,12 @@ public class PlayerController : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {        
+        if (collision.gameObject.name == "Enemy")
+        {
+            Debug.Log("You Lose");
+            Time.timeScale = 0;
+            YouLose.SetActive(true);
+        }
         if (collision.gameObject.name == "ProteinShake")
         {
             Debug.Log("Got the shake!");
@@ -65,7 +74,8 @@ public class PlayerController : MonoBehaviour
             {
                 Debug.Log("You win!");
                 Time.timeScale = 0;
-            }         
+                YouWin.SetActive(true);
+            }
         }
         /*if (collision.gameObject.tag == "Enemy")
         {
