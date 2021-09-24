@@ -13,23 +13,25 @@ public class State
     public enum EVENT
     {
         ENTER, UPDATE, EXIT
-    };
+    };    
 
     public STATE name;
     protected EVENT stage;
     protected GameObject npc;
+    protected Animator anim;
     protected Transform player;
     protected State nextState;
     protected NavMeshAgent agent;
 
     float visDist = 3.0f;
-    float visAngle = 70.0f;
+    float visAngle = 90.0f;
     float attackDist = 0.5f;
 
-    public State(GameObject _npc, NavMeshAgent _agent, Transform _player)
+    public State(GameObject _npc, NavMeshAgent _agent, Animator _anim, Transform _player)
     {
         npc = _npc;
         agent = _agent;
+        anim = _anim;
         stage = EVENT.ENTER;
         player = _player;
     }
@@ -75,14 +77,14 @@ public class State
 
 public class Idle : State
 {
-    public Idle(GameObject _npc, NavMeshAgent _agent, Transform _player)
-                : base(_npc, _agent, _player)
+    public Idle(GameObject _npc, NavMeshAgent _agent, Animator _anim, Transform _player)
+                : base(_npc, _agent, _anim, _player)
     {
         name = STATE.IDLE;
     }
 
     public override void Enter()
-    {
+    {        
         base.Enter();
     }
 
@@ -90,12 +92,12 @@ public class Idle : State
     {
         if (CanSeePlayer())
         {
-            nextState = new Pursue(npc, agent, player);
+            nextState = new Pursue(npc, agent, anim, player);
             stage = EVENT.EXIT;
         }
         else if (Random.Range(0, 100) < 10)
         {
-            nextState = new Patrol(npc, agent, player);
+            nextState = new Patrol(npc, agent, anim, player);
             stage = EVENT.EXIT;
         }
     }
@@ -110,8 +112,8 @@ public class Patrol : State
 {
     int currentIndex = -1;
 
-    public Patrol(GameObject _npc, NavMeshAgent _agent, Transform _player)
-                : base(_npc, _agent, _player)
+    public Patrol(GameObject _npc, NavMeshAgent _agent, Animator _anim, Transform _player)
+                : base(_npc, _agent, _anim, _player)
     {
         name = STATE.PATROL;
         agent.speed = 1;
@@ -120,6 +122,7 @@ public class Patrol : State
 
     public override void Enter()
     {
+        anim.SetTrigger("isWalking");
         currentIndex = 0;
         base.Enter();
     }
@@ -133,25 +136,26 @@ public class Patrol : State
             else
                 currentIndex++;
 
-            agent.SetDestination(GameEnvironment.Singleton.Checkpoints[currentIndex].transform.position);
+            agent.SetDestination(GameEnvironment.Singleton.Checkpoints[currentIndex].transform.position);            
         }
         if (CanSeePlayer())
         {
-            nextState = new Pursue(npc, agent, player);
+            nextState = new Pursue(npc, agent, anim, player);
             stage = EVENT.EXIT;
         }
     }
 
     public override void Exit()
     {
+        anim.ResetTrigger("isWalking");
         base.Exit();
     }
 }
 
 public class Pursue : State
 {
-    public Pursue(GameObject _npc, NavMeshAgent _agent, Transform _player)
-                : base(_npc, _agent, _player)
+    public Pursue(GameObject _npc, NavMeshAgent _agent, Animator _anim, Transform _player)
+                : base(_npc, _agent, _anim, _player)
     {
         name = STATE.PURSUE;
         agent.speed = 1.9f;
@@ -160,6 +164,7 @@ public class Pursue : State
 
     public override void Enter()
     {
+        anim.SetTrigger("isRunning");
         base.Enter();
     }
 
@@ -170,12 +175,12 @@ public class Pursue : State
         {
             if (CanAttackPlayer())
             {
-                nextState = new Attack(npc, agent, player);
+                nextState = new Attack(npc, agent, anim, player);
                 stage = EVENT.EXIT;
             }
             else if (!CanSeePlayer())
             {
-                nextState = new Patrol(npc, agent, player);
+                nextState = new Patrol(npc, agent, anim, player);
                 stage = EVENT.EXIT;
             }
         }
@@ -183,6 +188,7 @@ public class Pursue : State
 
     public override void Exit()
     {
+        anim.ResetTrigger("isRunning");
         base.Exit();
     }
 }
@@ -190,29 +196,31 @@ public class Pursue : State
 public class Attack : State
 {
     //float rotationSpeed = 2.0f;
-    public Attack(GameObject _npc, NavMeshAgent _agent, Transform _player)
-                : base(_npc, _agent, _player)
+    public Attack(GameObject _npc, NavMeshAgent _agent, Animator _anim, Transform _player)
+                : base(_npc, _agent, _anim, _player)
     {
         name = STATE.ATTACK;
     }
 
     public override void Enter()
     {
+        anim.SetTrigger("isPunching");
         base.Enter();
     }
 
     public override void Update()
     {
-        var distance = Vector3.Distance(player.position, npc.transform.position);
+        var distance = Vector3.Distance(player.position, npc.transform.position);        
         if (distance <= 1f)
         {
-            nextState = new Idle(npc, agent, player);
+            nextState = new Idle(npc, agent, anim, player);
             stage = EVENT.EXIT;
         }
     }
 
     public override void Exit()
     {
+        anim.ResetTrigger("isPunching");
         Debug.Log("You've been caught! Game over.");
         Time.timeScale = 0;
         base.Exit();

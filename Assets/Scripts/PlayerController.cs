@@ -14,6 +14,9 @@ public class PlayerController : MonoBehaviour
     public GameObject YouWin;
     public GameObject YouLose;
 
+    // Animation
+    public Animator anim;
+
     // Gameplay
     private bool hasShake = false;
 
@@ -21,6 +24,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         controller = gameObject.AddComponent<CharacterController>();
+        anim = GetComponent<Animator>();
     }
 
     // Update is called once per frame
@@ -30,6 +34,7 @@ public class PlayerController : MonoBehaviour
         if (groundedPlayer && playerVelocity.y < 0)
         {
             playerVelocity.y = 0f;
+            anim.SetBool("isWalking", false);
         }
 
         Vector3 move = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
@@ -38,6 +43,7 @@ public class PlayerController : MonoBehaviour
         if (move != Vector3.zero)
         {
             gameObject.transform.forward = move;
+            anim.SetBool("isWalking", true);
         }
 
         // Changes the height position of the player..
@@ -55,8 +61,10 @@ public class PlayerController : MonoBehaviour
         if (collision.gameObject.name == "Enemy")
         {
             Debug.Log("You Lose");
+            anim.SetBool("isCaught", true);
+            new WaitForSeconds(5);
             Time.timeScale = 0;
-            YouLose.SetActive(true);
+            //YouLose.SetActive(true);            
         }
         if (collision.gameObject.name == "ProteinShake")
         {
