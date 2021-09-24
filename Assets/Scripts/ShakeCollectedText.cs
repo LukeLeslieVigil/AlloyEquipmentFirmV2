@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ShakeCollectedText : MonoBehaviour
 {
-    public GameObject itself;
+    public GameObject shakeTextHolder;
     public GameObject proteinShake;
     public GameObject shakeText;
     private bool shakeExist = true;
@@ -21,7 +21,7 @@ public class ShakeCollectedText : MonoBehaviour
             if(proteinShake == null)
             {
                 shakeText.SetActive(true);
-                Destroy(itself, 3);
+                Destroy(shakeTextHolder, 3);
             }
         }
     }
