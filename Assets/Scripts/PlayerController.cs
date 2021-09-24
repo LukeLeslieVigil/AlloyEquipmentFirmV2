@@ -23,7 +23,7 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        controller = gameObject.AddComponent<CharacterController>();
+        controller = GetComponent<CharacterController>();
         anim = GetComponent<Animator>();
     }
 
@@ -64,7 +64,7 @@ public class PlayerController : MonoBehaviour
             anim.SetBool("isCaught", true);
             new WaitForSeconds(5);
             Time.timeScale = 0;
-            //YouLose.SetActive(true);            
+            YouLose.SetActive(true);            
         }
         if (collision.gameObject.name == "ProteinShake")
         {

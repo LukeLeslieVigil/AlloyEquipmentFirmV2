@@ -220,9 +220,9 @@ public class Attack : State
 
     public override void Exit()
     {
+        
         anim.ResetTrigger("isPunching");
         Debug.Log("You've been caught! Game over.");
-        Time.timeScale = 0;
         base.Exit();
     }
 }

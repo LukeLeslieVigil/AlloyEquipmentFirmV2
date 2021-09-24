@@ -14,7 +14,7 @@ public class MainMenu : MonoBehaviour
 
     public void PlayAgain()
     {
-        SceneManager.UnloadSceneAsync("MainStage");
+        //SceneManager.UnloadSceneAsync("MainStage");
         SceneManager.LoadScene("MainStage");
         Time.timeScale = 1;
     }
