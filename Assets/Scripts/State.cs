@@ -210,11 +210,12 @@ public class Attack : State
 
     public override void Update()
     {
-        var distance = Vector3.Distance(player.position, npc.transform.position);        
+        var distance = Vector3.Distance(player.position, npc.transform.position);
         if (distance <= 1f)
         {
             nextState = new Idle(npc, agent, anim, player);
             stage = EVENT.EXIT;
+
         }
     }
 
