@@ -56,16 +56,47 @@ public class PlayerController : MonoBehaviour
         controller.Move(playerVelocity * Time.deltaTime);
     }
 
-    void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.tag == "Enemy")
+        {
+            Debug.Log("You Lose");
+            anim.SetBool("isCaught", true);
+            new WaitForSeconds(5);
+            Time.timeScale = 0;
+            YouLose.SetActive(true);
+        }
+        else if (other.tag == "Shake")
+        {
+            Debug.Log("Got the shake!");
+            Destroy(other.gameObject);
+            hasShake = true;
+        }
+        else if (other.tag == "Door")
+        {
+            if (hasShake == false)
+            {
+                Debug.Log("You must get the shake first!");
+            }
+            if (hasShake == true)
+            {
+                Debug.Log("You win!");
+                Time.timeScale = 0;
+                YouWin.SetActive(true);
+            }
+        }
+    }
+
+    /*void OnCollisionEnter(Collision collision)
     {        
-        if (collision.gameObject.name == "Enemy")
+        *//*if (collision.gameObject.name == "Enemy")
         {
             Debug.Log("You Lose");
             anim.SetBool("isCaught", true);
             new WaitForSeconds(5);
             Time.timeScale = 0;
             YouLose.SetActive(true);            
-        }
+        }*//*
         if (collision.gameObject.name == "ProteinShake")
         {
             Debug.Log("Got the shake!");
@@ -85,10 +116,10 @@ public class PlayerController : MonoBehaviour
                 YouWin.SetActive(true);
             }
         }
-        /*if (collision.gameObject.tag == "Enemy")
+        *//*if (collision.gameObject.tag == "Enemy")
         {
             Debug.Log("You've been caught! Game over.");
             Time.timeScale = 0;
-        }*/
-    }
+        }*//*
+    }*/
 }
