@@ -14,13 +14,17 @@ public class PlayerController : MonoBehaviour
     public GameObject YouWin;
     public GameObject YouLose;
 
+    // Animation
+    public Animator anim;
+
     // Gameplay
     private bool hasShake = false;
 
     // Start is called before the first frame update
     void Start()
     {
-        controller = gameObject.AddComponent<CharacterController>();
+        controller = GetComponent<CharacterController>();
+        anim = GetComponent<Animator>();
     }
 
     // Update is called once per frame
@@ -30,6 +34,7 @@ public class PlayerController : MonoBehaviour
         if (groundedPlayer && playerVelocity.y < 0)
         {
             playerVelocity.y = 0f;
+            anim.SetBool("isWalking", false);
         }
 
         Vector3 move = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
@@ -38,6 +43,7 @@ public class PlayerController : MonoBehaviour
         if (move != Vector3.zero)
         {
             gameObject.transform.forward = move;
+            anim.SetBool("isWalking", true);
         }
 
         // Changes the height position of the player..
@@ -50,14 +56,47 @@ public class PlayerController : MonoBehaviour
         controller.Move(playerVelocity * Time.deltaTime);
     }
 
-    void OnCollisionEnter(Collision collision)
-    {        
-        if (collision.gameObject.name == "Enemy")
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.tag == "Enemy")
         {
             Debug.Log("You Lose");
+            anim.SetBool("isCaught", true);
+            new WaitForSeconds(5);
             Time.timeScale = 0;
             YouLose.SetActive(true);
         }
+        else if (other.tag == "Shake")
+        {
+            Debug.Log("Got the shake!");
+            Destroy(other.gameObject);
+            hasShake = true;
+        }
+        else if (other.tag == "Door")
+        {
+            if (hasShake == false)
+            {
+                Debug.Log("You must get the shake first!");
+            }
+            if (hasShake == true)
+            {
+                Debug.Log("You win!");
+                Time.timeScale = 0;
+                YouWin.SetActive(true);
+            }
+        }
+    }
+
+    /*void OnCollisionEnter(Collision collision)
+    {        
+        *//*if (collision.gameObject.name == "Enemy")
+        {
+            Debug.Log("You Lose");
+            anim.SetBool("isCaught", true);
+            new WaitForSeconds(5);
+            Time.timeScale = 0;
+            YouLose.SetActive(true);            
+        }*//*
         if (collision.gameObject.name == "ProteinShake")
         {
             Debug.Log("Got the shake!");
@@ -77,10 +116,10 @@ public class PlayerController : MonoBehaviour
                 YouWin.SetActive(true);
             }
         }
-        /*if (collision.gameObject.tag == "Enemy")
+        *//*if (collision.gameObject.tag == "Enemy")
         {
             Debug.Log("You've been caught! Game over.");
             Time.timeScale = 0;
-        }*/
-    }
+        }*//*
+    }*/
 }
